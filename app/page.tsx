@@ -471,9 +471,9 @@ export default function Page() {
 
         #car {
           position:absolute;
-          bottom:16vh;
+          bottom:12vh;
           left:-6vw;
-          width:72vw; max-width:900px;
+          width:60vw; max-width:750px;
           transform-origin:center bottom;
           will-change:transform;
         }
