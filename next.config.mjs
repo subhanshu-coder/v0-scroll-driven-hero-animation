@@ -1,17 +1,11 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   basePath: '/v0-scroll-driven-hero-animation',
-  images: {
-    unoptimized: true,
-  },
-  // ADD THIS SECTION:
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // This will ignore that 'globals.css' error
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
 };
-
 export default nextConfig;
