@@ -1,0 +1,9 @@
+1:"$Sreact.fragment"
+2:I[44747,["/v0-scroll-driven-hero-animation/_next/static/chunks/19d454086753f65d.js"],"ClientPageRoot"]
+3:I[38185,["/v0-scroll-driven-hero-animation/_next/static/chunks/58ce266a2b057bb2.js","/v0-scroll-driven-hero-animation/_next/static/chunks/57816c9fddc2d1b8.js"],"default"]
+6:I[4475,["/v0-scroll-driven-hero-animation/_next/static/chunks/19d454086753f65d.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+0:{"buildId":"H3KAP8E085p7Rl_UW1p85","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/v0-scroll-driven-hero-animation/_next/static/chunks/57816c9fddc2d1b8.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+4:{}
+5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null

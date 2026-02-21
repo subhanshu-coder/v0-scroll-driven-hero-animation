@@ -110,8 +110,9 @@ export default function Page() {
         duration: 0.3,
         delay: 1.75,
         ease: 'power2.out',
-        onComplete: () =>
-          gsap.to('#car', { y: 0, duration: 0.5, ease: 'bounce.out' }),
+        onComplete: () => {
+      gsap.to('#car', { y: 0, duration: 0.5, ease: 'bounce.out' });
+    },
       });
 
       // Idle float — while parked

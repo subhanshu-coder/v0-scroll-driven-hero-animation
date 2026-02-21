@@ -1,0 +1,4 @@
+1:"$Sreact.fragment"
+2:I[43376,["/v0-scroll-driven-hero-animation/_next/static/chunks/58ce266a2b057bb2.js","/v0-scroll-driven-hero-animation/_next/static/chunks/19d454086753f65d.js"],"default"]
+3:I[52415,["/v0-scroll-driven-hero-animation/_next/static/chunks/58ce266a2b057bb2.js","/v0-scroll-driven-hero-animation/_next/static/chunks/19d454086753f65d.js"],"default"]
+0:{"buildId":"H3KAP8E085p7Rl_UW1p85","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}
