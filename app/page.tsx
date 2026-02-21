@@ -1,61 +1,41 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 export default function Page() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    // Dynamically load GSAP
-    const loadGSAP = async () => {
-      const gsap = (await import('gsap')).default;
-      const ScrollTrigger = (await import('gsap/ScrollTrigger')).default;
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Create scroll animation
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '.hero',
-          start: 'top center',
-          end: 'bottom center',
-          scrub: 0.5,
-          markers: false,
-        },
-      });
-
-      tl.to('.hero-text', {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        stagger: 0.2,
-      })
-        .to(
-          '.scroll-element',
-          {
-            x: 100,
-            opacity: 0.5,
-            duration: 2,
-          },
-          0
-        )
-        .to(
-          '.bg-animation',
-          {
-            backgroundPosition: '100% 0%',
-            duration: 3,
-          },
-          0
-        );
+    // Vanilla JS scroll animation using Intersection Observer
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px',
     };
 
-    loadGSAP().catch(console.error);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all scroll elements
+    const elements = document.querySelectorAll('.scroll-element, .hero-text');
+    elements.forEach((el) => observer.observe(el));
+
+    // Parallax effect on scroll
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const bgAnimation = document.querySelector('.bg-animation');
+      if (bgAnimation instanceof HTMLElement) {
+        bgAnimation.style.backgroundPosition = `${scrollPosition * 0.5}px 0`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
 
     return () => {
-      // Cleanup ScrollTrigger on unmount
-      if (typeof window !== 'undefined') {
-        const { ScrollTrigger } = require('gsap/ScrollTrigger');
-        ScrollTrigger.getAll().forEach((trigger: any) => trigger.kill());
-      }
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
     };
   }, []);
 
@@ -120,9 +100,52 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* Load GSAP from CDN as fallback */}
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .hero-text {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        .scroll-element {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        .animate-in {
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .hero-text:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .scroll-element:nth-child(2) {
+          animation-delay: 0.1s;
+        }
+
+        .scroll-element:nth-child(3) {
+          animation-delay: 0.2s;
+        }
+
+        .scroll-element:nth-child(4) {
+          animation-delay: 0.3s;
+        }
+
+        .scroll-element:nth-child(5) {
+          animation-delay: 0.4s;
+        }
+      `}</style>
     </main>
   );
 }
