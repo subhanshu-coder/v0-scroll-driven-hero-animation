@@ -1,9 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Tells Next.js to generate static HTML
-  basePath: '/v0-scroll-driven-hero-animation', // REPLACE with your actual repository name
+  output: 'export',
+  basePath: '/v0-scroll-driven-hero-animation',
+  // This ensures the site knows it lives at /v0-scroll-driven-hero-animation/
   images: {
-    unoptimized: true, // GitHub Pages doesn't support the default Next.js Image Optimization
+    unoptimized: true,
   },
 };
 
