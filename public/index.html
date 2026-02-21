@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="ITZFIZZ - Premium Scroll-Driven Hero Section Animation showcasing advanced frontend animation techniques."/>
+  <meta name="keywords" content="animation, scroll-driven, GSAP, hero section, frontend, performance"/>
+  <meta name="theme-color" content="#d4a843"/>
+  <title>WELCOME ITZFIZZ | Scroll Animation Hero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg:    #05050a;
+      --gold:  #d4a843;
+      --red:   #e03820;
+      --cream: #ede8dc;
+      --dim:   rgba(237,232,220,0.38);
+      --line:  rgba(212,168,67,0.15);
+    }
+
+    html, body {
+      width: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ══ CURSOR ══ */
+    #c-dot {
+      position: fixed;
+      width: 7px;
+      height: 7px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+    }
+
+    #c-ring {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(212,168,67,.4);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ══ SCROLL PROGRESS ══ */
+    #prog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, var(--red), var(--gold));
+      transform-origin: left;
+      transform: scaleX(0);
+      z-index: 9000;
+    }
+
+    /* ══ PAGE SCROLL CONTAINER ══ */
+    #page {
+      height: 500vh;
+      position: relative;
+    }
+
+    /* Sticky viewport — always shows hero */
+    #scene {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ══ BACKGROUND ══ */
+    .bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 120% 55% at 50% 108%, rgba(212,168,67,.06) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 35% at 5%  65%,  rgba(26,120,200,.03)  0%, transparent 55%),
+        linear-gradient(170deg, #05050a 0%, #08080f 100%);
+    }
+
+    /* Perspective grid floor */
+    .grid {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 46%;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .grid::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(212,168,67,.075) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(212,168,67,.075) 1px, transparent 1px);
+      background-size: 56px 56px;
+      transform: perspective(460px) rotateX(68deg) translateY(-13%) scaleX(2.1);
+      transform-origin: bottom center;
+    }
+
+    .grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, var(--bg) 0%, transparent 50%);
+    }
+
+    /* Horizon glow line */
+    .horizon {
+      position: absolute;
+      bottom: 45%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      z-index: 2;
+      background: linear-gradient(to right,
+        transparent 0%,
+        rgba(212,168,67,.32) 22%,
+        rgba(224,56,32,.22)  50%,
+        rgba(212,168,67,.32) 78%,
+        transparent 100%);
+      filter: blur(1px);
+    }
+
+    /* Film grain */
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: .22;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+    }
+
+    /* ══ TOP BAR — logo only, no nav ══ */
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      padding: 28px 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 19px;
+      letter-spacing: .32em;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .logo em {
+      color: var(--red);
+      font-style: normal;
+    }
+
+    /* Slim top-right date/edition tag */
+    .edition {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: rgba(237,232,220,.24);
+    }
+
+    /* ══ HEADLINE — upper area, below the topbar ══ */
+    .headline-wrap {
+      position: absolute;
+      top: 88px;
+      left: 52px;
+      z-index: 20;
+    }
+
+    /* Small label above */
+    .pre-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      opacity: 0;
+    }
+
+    .pre-dash {
+      width: 26px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .pre-text {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .45em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* The two headline rows */
+    .hl-row {
+      overflow: hidden;
+    }
+
+    .hl-text {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(46px, 7.8vw, 118px);
+      line-height: .95;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      color: var(--cream);
+      transform: translateY(105%);
+    }
+
+    .hl-text.accent {
+      color: var(--gold);
+      letter-spacing: .26em;
+    }
+
+    /* Small italic sub */
+    .sub-line {
+      margin-top: 14px;
+      font-size: 12px;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: .12em;
+      color: var(--dim);
+      opacity: 0;
+    }
+
+    /* Vertical scroll hint — left side */
+    .scroll-hint {
+      position: absolute;
+      left: 52px;
+      bottom: 38px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+    }
+
+    .sh-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .42em;
+      text-transform: uppercase;
+      color: rgba(237,232,220,.25);
+    }
+
+    .sh-bar {
+      width: 38px;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      animation: barPulse 1.7s ease-in-out infinite;
+    }
+
+    @keyframes barPulse {
+      0%, 100% { transform: scaleX(1);   opacity: 1; }
+      50%      { transform: scaleX(.45); opacity: .35; }
+    }
+
+    /* ══ CAR ZONE ══ */
+    .car-zone {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68%;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* The car element itself — GSAP controls x position */
+    #car {
+      position: absolute;
+      bottom: 16vh;
+      left: -6vw;
+      width: 72vw;
+      max-width: 900px;
+      transform-origin: center bottom;
+      will-change: transform;
+    }
+
+    /* Ground shadow */
+    .c-shadow {
+      position: absolute;
+      bottom: -12px;
+      left: 8%;
+      right: 8%;
+      height: 22px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.9) 0%, transparent 70%);
+      filter: blur(8px);
+      z-index: -1;
+    }
+
+    /* Gold underglow */
+    .c-glow {
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      right: 20%;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(212,168,67,.4) 0%, transparent 70%);
+      filter: blur(9px);
+    }
+
+    /* Headlight beams */
+    .beam {
+      position: absolute;
+      top: 28%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+    }
+
+    .beam-l {
+      right: 100%;
+      width: 340px;
+      height: 180px;
+      background: conic-gradient(from 174deg at 100% 50%, rgba(155,205,255,.13) 0deg, transparent 22deg);
+      filter: blur(10px);
+      transform-origin: right center;
+    }
+
+    .beam-r {
+      left: 100%;
+      width: 340px;
+      height: 180px;
+      background: conic-gradient(from 0deg at 0% 50%, rgba(155,205,255,.13) 0deg, transparent 22deg);
+      filter: blur(10px);
+      transform-origin: left center;
+    }
+
+    .tail {
+      position: absolute;
+      top: 26%;
+      right: -4px;
+      width: 64px;
+      height: 55px;
+      background: radial-gradient(ellipse at left, rgba(224,56,32,.55) 0%, transparent 70%);
+      filter: blur(7px);
+    }
+
+    /* Speed streaks trailing left */
+    .streak {
+      position: absolute;
+      top: 50%;
+      height: 1px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+    }
+
+    .sk1 {
+      right: 0;
+      width: 480px;
+      transform: translateY(-50%);
+      background: linear-gradient(to left, transparent, rgba(212,168,67,.55), transparent);
+    }
+
+    .sk2 {
+      right: 0;
+      width: 290px;
+      top: 42%;
+      transform: translateY(-50%);
+      background: linear-gradient(to left, transparent, rgba(212,168,67,.30), transparent);
+    }
+
+    .sk3 {
+      right: 0;
+      width: 185px;
+      top: 59%;
+      transform: translateY(-50%);
+      background: linear-gradient(to left, transparent, rgba(212,168,67,.20), transparent);
+    }
+
+    .sk4 {
+      right: 0;
+      width: 390px;
+      transform: translateY(-50%);
+      background: linear-gradient(to left, transparent, rgba(212,168,67,.40), transparent);
+    }
+
+    /* ══ STATS — revealed by scroll ══ */
+    .stats {
+      position: absolute;
+      right: 52px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .stat {
+      text-align: right;
+      opacity: 0;
+      transform: translateX(36px);
+    }
+
+    /* Thin gold right-border per stat */
+    .stat-inner {
+      display: inline-block;
+      text-align: right;
+      padding-right: 18px;
+      border-right: 2px solid var(--line);
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1;
+      color: var(--gold);
+    }
+
+    .stat-num sup {
+      font-size: 24px;
+      color: var(--red);
+      vertical-align: super;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: .06em;
+      color: var(--dim);
+      margin-top: 2px;
+      line-height: 1.5;
+      max-width: 190px;
+    }
+
+    /* ══ BOTTOM CENTRE — year tag ══ */
+    .year-tag {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .5em;
+      text-transform: uppercase;
+      color: rgba(237,232,220,.16);
+      opacity: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .topbar {
+        padding: 20px 32px;
+      }
+
+      .headline-wrap {
+        top: 64px;
+        left: 32px;
+      }
+
+      .stats {
+        right: 32px;
+        gap: 20px;
+      }
+
+      .scroll-hint {
+        left: 32px;
+        bottom: 28px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 16px 24px;
+      }
+
+      .logo {
+        font-size: 14px;
+      }
+
+      .headline-wrap {
+        top: 48px;
+        left: 24px;
+      }
+
+      .hl-text {
+        font-size: clamp(32px, 6vw, 72px);
+      }
+
+      .stats {
+        right: 24px;
+        top: 55%;
+        gap: 16px;
+      }
+
+      .stat-num {
+        font-size: clamp(28px, 4vw, 48px);
+      }
+
+      .edition {
+        font-size: 8px;
+      }
+
+      #car {
+        width: 90vw;
+        bottom: 12vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 12px 16px;
+      }
+
+      .logo {
+        font-size: 12px;
+        letter-spacing: .2em;
+      }
+
+      .headline-wrap {
+        top: 40px;
+        left: 16px;
+      }
+
+      .hl-text {
+        font-size: clamp(24px, 5vw, 48px);
+        letter-spacing: .18em;
+      }
+
+      .stats {
+        display: none;
+      }
+
+      .scroll-hint {
+        left: 16px;
+        bottom: 20px;
+        gap: 8px;
+      }
+
+      .sh-bar {
+        width: 24px;
+      }
+
+      #car {
+        width: 100vw;
+        bottom: 10vh;
+        left: -50vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Cursor -->
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
+
+  <!-- Progress Bar -->
+  <div id="prog"></div>
+
+  <!-- Scroll Container -->
+  <div id="page">
+    <!-- Sticky Scene Container -->
+    <div id="scene">
+      <!-- Background -->
+      <div class="bg"></div>
+      <div class="grid"></div>
+      <div class="horizon"></div>
+      <div class="grain"></div>
+
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div class="logo">IT<em>Z</em>FIZZ</div>
+        <div class="edition">Performance · 2026</div>
+      </div>
+
+      <!-- Headline -->
+      <div class="headline-wrap">
+        <div class="pre-label">
+          <div class="pre-dash"></div>
+          <span class="pre-text">Welcome</span>
+        </div>
+        <div class="hl-row">
+          <span class="hl-text">W E L C O M E</span>
+        </div>
+        <div class="hl-row">
+          <span class="hl-text accent">I T Z F I Z Z</span>
+        </div>
+        <div class="sub-line">Where engineering becomes obsession.</div>
+      </div>
+
+      <!-- Scroll Hint -->
+      <div class="scroll-hint">
+        <span class="sh-label">Scroll</span>
+        <div class="sh-bar"></div>
+      </div>
+
+      <!-- Car Zone -->
+      <div class="car-zone">
+        <div id="car">
+          <!-- Streaks -->
+          <div class="streak sk1"></div>
+          <div class="streak sk2"></div>
+          <div class="streak sk3"></div>
+          <div class="streak sk4"></div>
+
+          <!-- Beams -->
+          <div class="beam beam-l"></div>
+          <div class="beam beam-r"></div>
+
+          <!-- Car SVG (simplified placeholder) -->
+          <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+            <!-- Car body outline -->
+            <path d="M 40 70 L 50 40 L 90 30 L 150 30 L 190 40 L 200 70 Z" fill="none" stroke="#d4a843" stroke-width="2" stroke-linejoin="round"/>
+            <!-- Windows -->
+            <rect x="60" y="35" width="25" height="20" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.6"/>
+            <rect x="155" y="35" width="25" height="20" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.6"/>
+            <!-- Wheels -->
+            <circle cx="65" cy="85" r="8" fill="none" stroke="#d4a843" stroke-width="2"/>
+            <circle cx="175" cy="85" r="8" fill="none" stroke="#d4a843" stroke-width="2"/>
+            <!-- Details -->
+            <line x1="40" y1="70" x2="200" y2="70" stroke="#d4a843" stroke-width="1" opacity="0.4"/>
+          </svg>
+
+          <!-- Lights -->
+          <div class="c-shadow"></div>
+          <div class="c-glow"></div>
+          <div class="tail"></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-inner">
+            <div class="stat-num">58<sup>%</sup></div>
+            <div class="stat-label">Increase in pick up point use</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-inner">
+            <div class="stat-num">23<sup>%</sup></div>
+            <div class="stat-label">Decreased in customer phone calls</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-inner">
+            <div class="stat-num">27<sup>%</sup></div>
+            <div class="stat-label">Increase in pick up point use</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-inner">
+            <div class="stat-num">40<sup>%</sup></div>
+            <div class="stat-label">Decreased in customer phone calls</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Year Tag -->
+      <div class="year-tag">Est. 2026 · Pure Performance</div>
+    </div>
+  </div>
+
+  <script>
+    // Register ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ══ Custom Cursor ══
+    const cDot = document.getElementById('c-dot');
+    const cRing = document.getElementById('c-ring');
+
+    document.addEventListener('mousemove', (e) => {
+      gsap.to(cDot, { x: e.clientX, y: e.clientY, duration: 0, overwrite: 'auto' });
+      gsap.to(cRing, { x: e.clientX, y: e.clientY, duration: 0.2, overwrite: 'auto' });
+    });
+
+    // ══ Scroll Progress Bar ══
+    const prog = document.getElementById('prog');
+    gsap.to(prog, {
+      scaleX: 1,
+      scrollTrigger: {
+        trigger: '#page',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        markers: false,
+      }
+    });
+
+    // ══ Initial Load Animations ══
+    const tlIntro = gsap.timeline();
+
+    // Pre-label fade in
+    tlIntro.to('.pre-label', {
+      opacity: 1,
+      duration: 0.8,
+      delay: 0.2,
+    }, 0);
+
+    // Headline reveal with stagger
+    tlIntro.to('.hl-text', {
+      y: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power2.out',
+    }, 0.3);
+
+    // Sub-line fade
+    tlIntro.to('.sub-line', {
+      opacity: 1,
+      duration: 0.8,
+    }, 0.6);
+
+    // Scroll hint fade
+    tlIntro.to('.scroll-hint', {
+      opacity: 1,
+      duration: 0.6,
+    }, 0.8);
+
+    // Year tag fade
+    tlIntro.to('.year-tag', {
+      opacity: 1,
+      duration: 0.6,
+    }, 0.8);
+
+    // ══ Scroll-Based Car Animation ══
+    gsap.to('#car', {
+      x: 500,
+      scrollTrigger: {
+        trigger: '#page',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.2,
+        markers: false,
+      },
+    });
+
+    // ══ Speed Streaks on Scroll ══
+    const streaks = ['.sk1', '.sk2', '.sk3', '.sk4'];
+    streaks.forEach((streak, index) => {
+      gsap.to(streak, {
+        opacity: 1,
+        scrollTrigger: {
+          trigger: '#page',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+        },
+      });
+    });
+
+    // ══ Headlight Beams on Scroll ══
+    gsap.to('.beam', {
+      opacity: 0.7,
+      scrollTrigger: {
+        trigger: '#page',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+      },
+    });
+
+    // ══ Stats Staggered Reveal on Scroll ══
+    gsap.to('.stat', {
+      opacity: 1,
+      x: 0,
+      stagger: 0.15,
+      scrollTrigger: {
+        trigger: '#page',
+        start: 'top+=200 top',
+        end: 'center top',
+        scrub: 1,
+      },
+    });
+
+    // ══ Responsive Scroll Trigger Updates ══
+    ScrollTrigger.addEventListener('refresh', () => {
+      // Refresh all triggers on resize
+    });
+
+    window.addEventListener('resize', () => {
+      ScrollTrigger.refresh();
+    });
+  </script>
+</body>
+</html>
